@@ -1,0 +1,298 @@
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#090b18">
+<title>WebMarket — Продажа сайтов</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:Arial,sans-serif;background:#090b18;color:#fff;line-height:1.6}
+header{background:#11152a;padding:18px 6%;display:flex;justify-content:space-between;align-items:center;gap:15px;flex-wrap:wrap;border-bottom:1px solid #292e4d}
+.logo{font-size:25px;font-weight:bold;color:#9d8cff}
+nav{display:flex;gap:20px;flex-wrap:wrap}
+a{color:#ddd;text-decoration:none}
+a:hover{color:#a99aff}
+button{border:0;border-radius:10px;padding:12px 18px;background:#7963ed;color:white;font-weight:bold;cursor:pointer}
+button:hover{background:#927fff}
+.container{width:90%;max-width:1150px;margin:auto}
+.hero{text-align:center;padding:85px 15px 65px;background:radial-gradient(ellipse at top,#29205c,#090b18 70%)}
+.hero h1{font-size:clamp(32px,6vw,55px);line-height:1.15;margin-bottom:18px}
+.hero p{color:#c3c5d7;font-size:18px;margin-bottom:25px}
+.section{padding:55px 0}
+.section h2{text-align:center;font-size:30px;margin-bottom:28px}
+.filters{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:25px}
+input,textarea,select{width:100%;padding:13px;border-radius:9px;border:1px solid #353a5d;background:#151a30;color:white;margin:7px 0;font:inherit}
+.filters input{flex:1;min-width:180px}
+.filters select{width:auto;min-width:160px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px}
+.card{background:#141a30;border:1px solid #292f50;border-radius:16px;padding:23px;transition:.2s}
+.card:hover{transform:translateY(-4px);border-color:#8270f3}
+.preview{height:125px;border-radius:12px;background:linear-gradient(135deg,#5544bb,#161d42);display:grid;place-items:center;font-size:35px;margin-bottom:17px}
+.card h3{font-size:20px;margin-bottom:8px}
+.muted{color:#aeb3ca}
+.price{font-size:22px;font-weight:bold;color:#a99aff;margin:14px 0}
+.tag{display:inline-block;background:#29234e;color:#c8bfff;padding:5px 10px;border-radius:20px;font-size:12px}
+.features{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:18px}
+.feature{background:#141a30;padding:22px;border-radius:14px;border:1px solid #292f50}
+footer{text-align:center;padding:30px;color:#aeb3ca;border-top:1px solid #292f50}
+.modal{display:none;position:fixed;inset:0;background:#000b;z-index:5;align-items:center;justify-content:center;padding:15px}
+.modal.active{display:flex}
+.modal-content{background:#171d35;padding:25px;border-radius:16px;width:100%;max-width:430px;max-height:90vh;overflow:auto}
+.modal-content h2{margin-bottom:15px}
+.close{float:right;background:#303653;padding:6px 11px}
+.full{width:100%;margin-top:9px}
+.review{margin-top:13px;padding:15px;background:#10162a;border-radius:10px}
+.profile{display:none}
+.profile.active{display:block}
+#notice{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#29234e;padding:13px 20px;border-radius:10px;display:none;z-index:10}
+@media(max-width:600px){
+ header{justify-content:center}
+ nav{justify-content:center;gap:13px}
+ .hero{padding:60px 12px}
+ .filters select{width:100%}
+}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="logo">✦ WebMarket</div>
+ <nav>
+  <a href="#home">Главная</a>
+  <a href="#catalog">Каталог</a>
+  <a href="#about">О нас</a>
+  <a href="#reviews">Отзывы</a>
+  <a href="#profile">Профиль</a>
+ </nav>
+ <button onclick="openModal('auth')">Войти</button>
+</header>
+
+<main>
+<section class="hero" id="home">
+ <div class="container">
+  <span class="tag">МАРКЕТПЛЕЙС САЙТОВ</span>
+  <h1>Найди сайт своей мечты</h1>
+  <p>Готовые сайты для бизнеса, проектов и личных идей.</p>
+  <a href="#catalog"><button>Смотреть каталог →</button></a>
+ </div>
+</section>
+
+<section class="section container" id="catalog">
+ <h2>Каталог сайтов</h2>
+ <div class="filters">
+  <input id="search" placeholder="Поиск сайта..." oninput="renderSites()">
+  <select id="category" onchange="renderSites()">
+   <option value="all">Все категории</option>
+   <option value="Бизнес">Бизнес</option>
+   <option value="Магазин">Магазины</option>
+   <option value="Блог">Блоги</option>
+   <option value="Игры">Игры</option>
+  </select>
+ </div>
+ <div class="grid" id="catalogGrid"></div>
+</section>
+
+<section class="section container" id="about">
+ <h2>Почему WebMarket?</h2>
+ <div class="features">
+  <div class="feature"><h3>🚀 Быстро</h3><p class="muted">Удобный каталог готовых проектов.</p></div>
+  <div class="feature"><h3>💎 Разнообразие</h3><p class="muted">Сайты на разные темы и для разных задач.</p></div>
+  <div class="feature"><h3>🤝 Поддержка</h3><p class="muted">Можно отправить вопрос через профиль.</p></div>
+ </div>
+</section>
+
+<section class="section container" id="reviews">
+ <h2>Отзывы пользователей</h2>
+ <div id="reviewsList"></div>
+ <div class="card" style="margin-top:20px">
+  <h3>Оставить отзыв</h3>
+  <textarea id="reviewText" placeholder="Напишите свой отзыв..."></textarea>
+  <button onclick="addReview()">Отправить отзыв</button>
+ </div>
+</section>
+
+<section class="section container" id="profile">
+ <h2>Личный кабинет</h2>
+ <div class="card">
+  <div id="guest">
+   <p class="muted">Войдите или зарегистрируйтесь, чтобы открыть профиль.</p>
+   <button onclick="openModal('auth')">Войти / Регистрация</button>
+  </div>
+  <div class="profile" id="userProfile">
+   <h3 id="userName"></h3>
+   <p class="muted">Ваш профиль WebMarket</p>
+   <hr style="margin:18px 0;border-color:#353a5d">
+   <h3>🛟 Поддержка</h3>
+   <textarea id="supportText" placeholder="Опишите свой вопрос..."></textarea>
+   <button onclick="sendSupport()">Отправить обращение</button>
+   <h3 style="margin-top:20px">Мои обращения</h3>
+   <div id="supportList"></div>
+   <button onclick="logout()" style="background:#a33d56;margin-top:20px">Выйти</button>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer>
+ <p>© 2026 WebMarket. Демонстрационный маркетплейс сайтов.</p>
+ <p>Свяжитесь с нами через раздел поддержки.</p>
+</footer>
+
+<div class="modal" id="auth">
+ <div class="modal-content">
+  <button class="close" onclick="closeModal('auth')">✕</button>
+  <h2>Вход и регистрация</h2>
+  <input id="username" placeholder="Ваше имя">
+  <input id="email" type="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Пароль">
+  <button class="full" onclick="register()">Зарегистрироваться</button>
+  <button class="full" style="background:#303653" onclick="login()">Войти</button>
+  <p class="muted" style="font-size:12px;margin-top:12px">Демонстрационный режим: данные хранятся только в этом браузере. Не вводите реальные пароли.</p>
+ </div>
+</div>
+
+<div class="modal" id="siteModal">
+ <div class="modal-content">
+  <button class="close" onclick="closeModal('siteModal')">✕</button>
+  <div id="siteDetails"></div>
+ </div>
+</div>
+
+<div id="notice"></div>
+
+<script>
+const sites=[
+ {id:1,name:"Business Pro",category:"Бизнес",price:"4 900 ₽",icon:"💼",description:"Современный шаблон сайта для компании или предпринимателя."},
+ {id:2,name:"Shop Online",category:"Магазин",price:"6 500 ₽",icon:"🛍️",description:"Дизайн интернет-магазина с карточками товаров."},
+ {id:3,name:"Personal Blog",category:"Блог",price:"2 900 ₽",icon:"✍️",description:"Удобный шаблон личного блога или портфолио."},
+ {id:4,name:"Game Portal",category:"Игры",price:"5 500 ₽",icon:"🎮",description:"Стильный игровой портал с разделами и новостями."},
+ {id:5,name:"Creative Studio",category:"Бизнес",price:"7 200 ₽",icon:"🎨",description:"Сайт для творческой студии и команды."},
+ {id:6,name:"Mini Shop",category:"Магазин",price:"3 500 ₽",icon:"📦",description:"Простой и аккуратный дизайн небольшого магазина."}
+];
+
+function renderSites(){
+ const q=document.getElementById("search").value.toLowerCase();
+ const cat=document.getElementById("category").value;
+ const filtered=sites.filter(s=>
+  s.name.toLowerCase().includes(q)&&
+  (cat==="all"||s.category===cat)
+ );
+ document.getElementById("catalogGrid").innerHTML=filtered.length?
+ filtered.map(s=>`
+ <article class="card">
+  <div class="preview">${s.icon}</div>
+  <span class="tag">${s.category}</span>
+  <h3>${s.name}</h3>
+  <p class="muted">${s.description}</p>
+  <div class="price">${s.price}</div>
+  <button onclick="showSite(${s.id})">Подробнее</button>
+ </article>`).join(""):"<p>Ничего не найдено.</p>";
+}
+
+function showSite(id){
+ const s=sites.find(x=>x.id===id);
+ document.getElementById("siteDetails").innerHTML=`
+ <div class="preview">${s.icon}</div>
+ <h2>${s.name}</h2>
+ <span class="tag">${s.category}</span>
+ <p style="margin:15px 0">${s.description}</p>
+ <div class="price">${s.price}</div>
+ <p class="muted">Это демонстрационная карточка. Реальная покупка пока не подключена.</p>
+ <button class="full" onclick="notify('Покупки пока доступны только в демонстрационном режиме.')">Заказать сайт</button>`;
+ openModal("siteModal");
+}
+
+function openModal(id){document.getElementById(id).classList.add("active")}
+function closeModal(id){document.getElementById(id).classList.remove("active")}
+
+function notify(msg){
+ const n=document.getElementById("notice");
+ n.textContent=msg;n.style.display="block";
+ setTimeout(()=>n.style.display="none",3000);
+}
+
+function getUsers(){return JSON.parse(localStorage.getItem("wm_users")||"[]")}
+function register(){
+ const name=document.getElementById("username").value.trim();
+ const email=document.getElementById("email").value.trim().toLowerCase();
+ const pass=document.getElementById("password").value;
+ if(!name||!email||!pass){notify("Заполните все поля.");return}
+ if(pass.length<6){notify("Пароль должен содержать минимум 6 символов.");return}
+ const users=getUsers();
+ if(users.some(u=>u.email===email)){notify("Такой аккаунт уже существует.");return}
+ users.push({name,email,pass});
+ localStorage.setItem("wm_users",JSON.stringify(users));
+ localStorage.setItem("wm_current",email);
+ closeModal("auth");updateProfile();notify("Регистрация завершена!");
+}
+function login(){
+ const email=document.getElementById("email").value.trim().toLowerCase();
+ const pass=document.getElementById("password").value;
+ const user=getUsers().find(u=>u.email===email&&u.pass===pass);
+ if(!user){notify("Неверный email или пароль.");return}
+ localStorage.setItem("wm_current",email);
+ closeModal("auth");updateProfile();notify("Вы вошли!");
+}
+function logout(){
+ localStorage.removeItem("wm_current");
+ updateProfile();notify("Вы вышли из аккаунта.");
+}
+function currentUser(){
+ return getUsers().find(u=>u.email===localStorage.getItem("wm_current"));
+}
+function updateProfile(){
+ const user=currentUser();
+ document.getElementById("guest").style.display=user?"none":"block";
+ document.getElementById("userProfile").classList.toggle("active",!!user);
+ if(user){
+  document.getElementById("userName").textContent="Здравствуйте, "+user.name+"!";
+  renderSupport();
+ }
+}
+
+function sendSupport(){
+ const text=document.getElementById("supportText").value.trim();
+ if(!currentUser()){notify("Сначала войдите в аккаунт.");return}
+ if(!text){notify("Напишите сообщение.");return}
+ const key="wm_support_"+currentUser().email;
+ const arr=JSON.parse(localStorage.getItem(key)||"[]");
+ arr.push({text,date:new Date().toLocaleString("ru-RU")});
+ localStorage.setItem(key,JSON.stringify(arr));
+ document.getElementById("supportText").value="";
+ renderSupport();notify("Обращение сохранено.");
+}
+function renderSupport(){
+ const user=currentUser();if(!user)return;
+ const arr=JSON.parse(localStorage.getItem("wm_support_"+user.email)||"[]");
+ document.getElementById("supportList").innerHTML=arr.length?
+ arr.map(x=>`<div class="review"><p>${escapeHTML(x.text)}</p><small class="muted">${x.date}</small></div>`).join(""):
+ '<p class="muted">Обращений пока нет.</p>';
+}
+function escapeHTML(s){
+ return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+
+function addReview(){
+ const text=document.getElementById("reviewText").value.trim();
+ if(!text){notify("Напишите отзыв.");return}
+ const reviews=JSON.parse(localStorage.getItem("wm_reviews")||"[]");
+ reviews.push({text,date:new Date().toLocaleDateString("ru-RU")});
+ localStorage.setItem("wm_reviews",JSON.stringify(reviews));
+ document.getElementById("reviewText").value="";
+ renderReviews();notify("Отзыв добавлен.");
+}
+function renderReviews(){
+ const reviews=JSON.parse(localStorage.getItem("wm_reviews")||"[]");
+ document.getElementById("reviewsList").innerHTML=reviews.length?
+ reviews.map(r=>`<div class="review"><p>${escapeHTML(r.text)}</p><small class="muted">${r.date}</small></div>`).join(""):
+ '<p class="muted">Пока нет отзывов. Будьте первым!</p>';
+}
+
+renderSites();
+renderReviews();
+updateProfile();
+</script>
+</body>
+</html>
